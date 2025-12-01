@@ -1,0 +1,32 @@
+[Unit]
+Description=scr-protector Dashboard
+Documentation=https://github.com/yourusername/scr-protector
+After=network.target
+
+[Service]
+Type=simple
+User=scr-protector
+Group=scr-protector
+WorkingDirectory=/opt/scr-protector/dashboard
+Environment="PATH=/opt/scr-protector/venv/bin"
+
+# Run with gunicorn for production
+ExecStart=/opt/scr-protector/venv/bin/gunicorn --bind 127.0.0.1:8080 --workers 2 --timeout 30 app:app
+
+# Restart on failure
+Restart=on-failure
+RestartSec=5
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/scr-protector
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=scr-dashboard
+
+[Install]
+WantedBy=multi-user.target

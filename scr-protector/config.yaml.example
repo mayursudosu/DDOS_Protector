@@ -1,0 +1,136 @@
+# =============================================================================
+# scr-protector: Configuration File
+# =============================================================================
+# Copy this file to config.yaml and customize as needed.
+# Default values are conservative and secure.
+# =============================================================================
+
+# Installation paths
+INSTALL_DIR: /opt/scr-protector
+SITE_ROOT: /var/www/html
+
+# =============================================================================
+# Dashboard Settings
+# =============================================================================
+# SECURITY: By default, dashboard only listens on localhost.
+# Access via SSH tunnel: ssh -L 8080:localhost:8080 user@server
+
+DASHBOARD_PORT: 8080
+DASHBOARD_BIND: 127.0.0.1
+
+# WARNING: Setting this to true exposes the dashboard publicly.
+# Only enable if you have additional authentication (e.g., Cloudflare Access)
+ALLOW_DASHBOARD_PUBLIC: false
+
+# =============================================================================
+# Rate Limiting (NGINX)
+# =============================================================================
+# These values are applied in the NGINX config snippet.
+# Adjust based on your traffic patterns.
+
+# Requests per second per IP
+RATE_LIMIT: 10r/s
+
+# Burst capacity - allows short spikes above the rate limit
+BURST: 20
+
+# =============================================================================
+# Challenge Page
+# =============================================================================
+# Path where rate-limited clients are redirected
+CHALLENGE_PATH: /__scr_challenge
+
+# =============================================================================
+# Anubis Integration
+# =============================================================================
+# When enabled, the local challenge.html is disabled and Anubis handles
+# bot verification. You must register at https://anubis.techaro.lol and
+# add the Anubis script to your website's <head> section.
+#
+# See README.md for detailed setup instructions.
+USE_ANUBIS: false
+
+# =============================================================================
+# IP Blocking
+# =============================================================================
+# ipset name for blocked IPs
+IPS_NAME: scr_blockset
+
+# File containing IPs to block (one per line)
+BLOCKLIST_FILE: /opt/scr-protector/blocklist.txt
+
+# =============================================================================
+# Log Parsing
+# =============================================================================
+# NGINX access log to monitor
+NGINX_ACCESS_LOG: /var/log/nginx/access.log
+
+# Auth log for SSH monitoring (if enabled)
+SSH_AUTH_LOG: /var/log/auth.log
+
+# =============================================================================
+# Auto-Blocking Settings
+# =============================================================================
+# When enabled, the parser will automatically add IPs to the blocklist
+# based on suspicious behavior patterns.
+
+# Master switch for auto-blocking
+AUTO_BLOCK_ENABLED: true
+
+# =============================================================================
+# Alert Thresholds
+# =============================================================================
+# These thresholds determine when events escalate to warnings and alerts.
+# Tune these based on your traffic patterns to minimize false positives.
+
+# HTTP abuse: Number of 429 errors from same IP before WARN
+WARN_THRESHOLD_429: 5
+WARN_WINDOW_429_MIN: 1
+
+# HTTP abuse: Total suspicious events before ALERT and auto-block
+ALERT_THRESHOLD_HTTP: 7
+ALERT_WINDOW_HTTP_MIN: 10
+
+# SSH abuse: Failed logins from same IP before ALERT and auto-block
+ALERT_THRESHOLD_SSH: 5
+ALERT_WINDOW_SSH_MIN: 5
+
+# High request rate threshold (requests in sliding window)
+HIGH_RATE_THRESHOLD: 100
+HIGH_RATE_WINDOW_SEC: 60
+
+# =============================================================================
+# SSH Analytics (Future Hook)
+# =============================================================================
+# Enable monitoring of SSH login failures from auth.log
+# When enabled, failed SSH logins are tracked and can trigger auto-blocking
+
+SSH_ANALYTICS_ENABLED: true
+
+# =============================================================================
+# Email Alerts (Placeholder)
+# =============================================================================
+# When enabled, critical alerts are sent via email.
+# Configure your SMTP settings below.
+
+EMAIL_ALERT_ENABLED: false
+EMAIL_SMTP_SERVER: ""
+EMAIL_SMTP_PORT: 587
+EMAIL_SMTP_USER: ""
+EMAIL_SMTP_PASS: ""
+EMAIL_FROM: "scr-protector@localhost"
+EMAIL_TO: "admin@localhost"
+
+# =============================================================================
+# Severity Levels
+# =============================================================================
+# INFO  - Normal logging, no action needed
+# WARN  - Suspicious activity detected, logged for review
+# ALERT - High-severity event, may trigger auto-blocking
+#
+# Events are classified based on:
+# - Rate limit hits (429s)
+# - High request rates
+# - SSH login failures
+# - Pattern matching (future)
+# =============================================================================
