@@ -333,8 +333,9 @@ def api_block():
         ''', (ip, notes))
         db.commit()
         
-        # Apply blocklist
-        subprocess.run([APPLY_SCRIPT], capture_output=True)
+        # Apply blocklist (skip if script doesn't exist - demo mode)
+        if os.path.exists(APPLY_SCRIPT):
+            subprocess.run([APPLY_SCRIPT], capture_output=True)
         
         return jsonify({'success': True, 'ip': ip})
     
@@ -370,8 +371,9 @@ def api_unblock():
         db.execute('DELETE FROM blocked_ips WHERE ip = ?', (ip,))
         db.commit()
         
-        # Apply blocklist
-        subprocess.run([APPLY_SCRIPT], capture_output=True)
+        # Apply blocklist (skip if script doesn't exist - demo mode)
+        if os.path.exists(APPLY_SCRIPT):
+            subprocess.run([APPLY_SCRIPT], capture_output=True)
         
         return jsonify({'success': True, 'ip': ip})
     
