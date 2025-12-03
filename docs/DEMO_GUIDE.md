@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, ip TEXT, ts DATETIME,
 CREATE TABLE IF NOT EXISTS blocked_ips (ip TEXT PRIMARY KEY, ts DATETIME, source TEXT, notes TEXT);
 ''')
 
-# Add admin user
-db.execute("INSERT OR REPLACE INTO users VALUES (1, 'admin', 'pbkdf2:sha256:600000$x$demo')")
+# Add admin user with hashed password
+from werkzeug.security import generate_password_hash
+db.execute("INSERT OR REPLACE INTO users VALUES (1, 'rms', ?)", (generate_password_hash('LinuxOS'),))
 
 # Add 50 sample events
 ips = ["185.220.101.42", "45.155.205.233", "192.168.1.100", "10.0.0.50"]
@@ -89,7 +90,7 @@ from flask import session
 @app.app.before_request
 def auto_login():
     session['user_id'] = 1
-    session['username'] = 'admin'
+    session['username'] = 'rms'
 
 print("🎯 Dashboard running with demo data")
 print("🌐 Open: http://localhost:8080/admin")

@@ -95,8 +95,10 @@ CREATE INDEX idx_events_ts ON events(ts);
 CREATE INDEX idx_events_severity ON events(severity);
 ''')
 
-# Add demo admin user (password doesn't matter - auto-login enabled)
-conn.execute("INSERT INTO users (username, password_hash) VALUES ('admin', 'demo')")
+# Add demo admin user with proper hashed password
+from werkzeug.security import generate_password_hash
+password_hash = generate_password_hash('LinuxOS')
+conn.execute("INSERT INTO users (username, password_hash) VALUES ('rms', ?)", (password_hash,))
 
 # Sample data
 attacker_ips = [
@@ -162,7 +164,7 @@ conn.close()
 print("✓ Created demo database with:")
 print("  - 75 sample security events")
 print("  - 3 blocked IPs")
-print("  - Admin user (auto-login enabled)")
+print("  - User: rms / LinuxOS")
 PYTHON_SCRIPT
 
 echo -e "${GREEN}✓ Demo database created${NC}"
@@ -183,7 +185,7 @@ echo -e "${CYAN}   Starting Dashboard${NC}"
 echo -e "${CYAN}============================================================${NC}"
 echo ""
 echo -e "  ${GREEN}➜${NC}  Dashboard URL: ${YELLOW}http://localhost:8080/admin${NC}"
-echo -e "  ${GREEN}➜${NC}  Auto-login enabled (no password needed)"
+echo -e "  ${GREEN}➜${NC}  Login: ${YELLOW}rms${NC} / ${YELLOW}LinuxOS${NC} (auto-login enabled)"
 echo -e "  ${GREEN}➜${NC}  Press ${RED}Ctrl+C${NC} to stop"
 echo ""
 echo -e "${CYAN}============================================================${NC}"
@@ -206,7 +208,7 @@ from flask import session
 @app.app.before_request
 def auto_login():
     session['user_id'] = 1
-    session['username'] = 'admin'
+    session['username'] = 'rms'
 
 # Disable secure cookie for localhost demo
 app.app.config['SESSION_COOKIE_SECURE'] = False
