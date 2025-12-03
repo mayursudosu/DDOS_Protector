@@ -52,10 +52,10 @@ DDOS_Protector/
 │   └── LICENSE              # MIT License
 │
 ├── 📚 Documentation
-│   ├── README.md            # Main documentation
-│   ├── INSTALL_GUIDE.md     # Beginner-friendly guide
-│   ├── DEPLOY_QUICK.md      # Quick deployment steps
-│   └── PROJECT_OVERVIEW.md  # This file
+│   └── docs/
+│       ├── INSTALL_GUIDE.md     # Beginner-friendly guide
+│       ├── DEPLOY_QUICK.md      # Quick deployment steps
+│       └── PROJECT_OVERVIEW.md  # This file
 │
 ├── 🔧 Core Engine
 │   └── core/
