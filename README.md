@@ -1,6 +1,6 @@
 # scr-protector
 
-**Server-first HTTP security layer for Ubuntu Server (including Raspberry Pi)**
+**Server-first HTTP security layer for any Physical Server (including Raspberry Pi)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
