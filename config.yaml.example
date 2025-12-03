@@ -134,3 +134,39 @@ EMAIL_TO: "admin@localhost"
 # - SSH login failures
 # - Pattern matching (future)
 # =============================================================================
+
+# =============================================================================
+# Plugin System
+# =============================================================================
+# Plugins extend DDOS Protector with custom detection, actions, and blockers.
+# Place plugin files in /opt/scr-protector/plugins/
+# See plugins/example_plugin.py for templates.
+
+PLUGINS_ENABLED: true
+PLUGINS_DIR: /opt/scr-protector/plugins
+
+# Plugin-specific configuration
+plugins:
+  # Example detector plugin
+  example_detector:
+    enabled: false
+    pattern: "malicious"
+    severity: WARN
+  
+  # Webhook notifications (Slack, Discord, etc.)
+  webhook_action:
+    enabled: false
+    url: ""  # https://hooks.slack.com/services/XXX/YYY/ZZZ
+    min_severity: ALERT
+  
+  # External blocker (for additional firewalls/WAFs)
+  example_blocker:
+    enabled: false
+    blocklist_file: /tmp/external-blocklist.txt
+
+  # --- Add your custom plugins below ---
+  # my_custom_plugin:
+  #   enabled: true
+  #   setting1: value1
+  #   setting2: value2
+

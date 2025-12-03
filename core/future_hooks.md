@@ -1,6 +1,31 @@
-# Future Hooks for scr-protector
+# Future Hooks for DDOS Protector
 
-This document describes planned security features that are not yet fully implemented. These exist as hooks in the code for future development.
+This document describes planned security features and extension points. Many features can now be implemented as **plugins** using the new plugin system.
+
+## 🔌 Plugin System
+
+**Status**: ✅ Implemented
+
+DDOS Protector now includes a modular plugin system for easy extension:
+
+### Plugin Types
+
+| Type | Purpose | Example Use Cases |
+|------|---------|-------------------|
+| `DetectorPlugin` | Find new threats | SQL injection, XSS, port scans |
+| `ActionPlugin` | Respond to events | Webhooks, email, SMS |
+| `BlockerPlugin` | Block via external services | Cloudflare, AWS WAF |
+
+### Creating a Plugin
+
+1. Create a `.py` file in `/opt/scr-protector/plugins/`
+2. Implement the appropriate plugin class
+3. Enable in `config.yaml` under `plugins:`
+4. Restart services
+
+See `plugins/example_plugin.py` for templates.
+
+---
 
 ## SSH Brute-Force Detection
 
@@ -98,27 +123,19 @@ REPUTATION_DECAY_RATE: 0.1    # per hour
 
 ## Webhook Notifications
 
-**Status**: 🔲 Not Implemented
+**Status**: ✅ Implemented as Plugin
 
-Send alerts to external services:
-- Slack
-- Discord
-- PagerDuty
-- Custom webhooks
+Send alerts to external services via the `WebhookAction` plugin:
 
-Implementation:
-1. Add webhook URL to config
-2. Format alert as JSON payload
-3. POST to webhook on ALERT events
-
-Future config:
 ```yaml
-WEBHOOK_ENABLED: false
-WEBHOOK_URL: https://hooks.slack.com/services/xxx
-WEBHOOK_EVENTS:
-  - ALERT
-  - block
+plugins:
+  webhook_action:
+    enabled: true
+    url: https://hooks.slack.com/services/xxx
+    min_severity: ALERT
 ```
+
+Supports: Slack, Discord, Microsoft Teams, custom endpoints.
 
 ---
 
@@ -182,6 +199,16 @@ Implementation:
 
 Want to implement one of these features? Here's how:
 
+### Option 1: Create a Plugin (Recommended)
+
+1. Copy `plugins/example_plugin.py` to `plugins/my_feature.py`
+2. Implement `DetectorPlugin`, `ActionPlugin`, or `BlockerPlugin`
+3. Add configuration to `config.yaml.example`
+4. Test locally before deploying
+5. Submit a pull request
+
+### Option 2: Modify Core
+
 1. Update `config.yaml.example` with new settings
 2. Add parsing logic to `parser.py`
 3. Add relevant database tables/columns
@@ -189,8 +216,10 @@ Want to implement one of these features? Here's how:
 5. Update this document to mark as implemented
 6. Submit a pull request
 
-Guidelines:
+### Guidelines
+
 - Keep resource usage low (Raspberry Pi compatibility)
 - Make features configurable and off by default
 - Maintain idempotent installation
 - Add tests in `test.sh`
+- Prefer plugins over core changes when possible
