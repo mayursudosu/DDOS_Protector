@@ -326,6 +326,9 @@ sudo nginx -t && sudo systemctl reload nginx
 ### Option B: Reverse Proxy
 
 ```bash
+# Make sure directories exist first!
+sudo mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+
 sudo tee /etc/nginx/sites-available/myapp << 'EOF'
 server {
     listen 80;
