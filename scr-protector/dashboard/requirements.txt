@@ -1,7 +1,0 @@
-# scr-protector Dashboard Requirements
-# Install with: pip install -r requirements.txt
-
-flask>=2.3.0
-gunicorn>=21.0.0
-werkzeug>=2.3.0
-pyyaml>=6.0
