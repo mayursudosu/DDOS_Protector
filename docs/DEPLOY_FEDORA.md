@@ -4,6 +4,27 @@
 
 ---
 
+## 🚀 Quick Local Setup (Recommended for Demo)
+
+If you want to quickly set up everything for a demo:
+
+```bash
+cd ~/DDOS_Protector
+chmod +x setup_fedora_local.sh
+sudo ./setup_fedora_local.sh
+```
+
+This script:
+- Installs all dependencies
+- Sets up NGINX with rate limiting
+- Creates a demo website at `/var/www/mysite/`
+- Configures ipset blocklist
+- Creates the database and admin user
+
+Then you can attack from another terminal to demo!
+
+---
+
 ## Prerequisites
 
 Update your system first:
@@ -549,6 +570,134 @@ cd ~/DDOS_Protector
 ```
 
 This runs a demo with sample data - no root required!
+
+---
+
+## 📁 Adding Your Website Files
+
+Your website files go in: `/var/www/mysite/`
+
+### Add Single Files
+
+```bash
+# Copy HTML file
+sudo cp mypage.html /var/www/mysite/
+
+# Copy CSS/JS files
+sudo cp style.css /var/www/mysite/
+sudo cp script.js /var/www/mysite/
+
+# Copy images
+sudo cp -r images/ /var/www/mysite/
+```
+
+### Add a Complete Website Folder
+
+```bash
+# Copy entire folder contents
+sudo cp -r my-website/* /var/www/mysite/
+
+# Or create a subdirectory
+sudo cp -r my-project/ /var/www/mysite/project/
+```
+
+### Fix Permissions After Adding Files
+
+```bash
+# Set correct ownership
+sudo chown -R nginx:nginx /var/www/mysite/
+
+# Set correct permissions
+sudo chmod -R 755 /var/www/mysite/
+
+# Fix SELinux context
+sudo chcon -Rt httpd_sys_content_t /var/www/mysite/
+```
+
+### Example: Add a React/Vue Build
+
+```bash
+# Build your app
+cd my-react-app
+npm run build
+
+# Copy build output to server
+sudo cp -r build/* /var/www/mysite/
+
+# Fix permissions
+sudo chown -R nginx:nginx /var/www/mysite/
+sudo chcon -Rt httpd_sys_content_t /var/www/mysite/
+```
+
+### Example: Add PHP Files (if using PHP)
+
+```bash
+# Install PHP-FPM
+sudo dnf install -y php-fpm php-common
+
+# Start PHP-FPM
+sudo systemctl enable --now php-fpm
+
+# Add PHP file
+sudo tee /var/www/mysite/info.php << 'EOF'
+<?php phpinfo(); ?>
+EOF
+
+# Update NGINX config to handle PHP (edit /etc/nginx/sites-available/mysite.conf)
+```
+
+### Verify Your Files
+
+```bash
+# List files in website root
+ls -la /var/www/mysite/
+
+# Test in browser
+curl http://localhost/
+
+# Check NGINX can read them
+sudo -u nginx cat /var/www/mysite/index.html
+```
+
+---
+
+## 🎯 Demo Attack Commands
+
+### Terminal 1: Watch the logs
+```bash
+sudo tail -f /var/log/nginx/access.log
+```
+
+### Terminal 2: Run the attack
+```bash
+# Simple flood (will trigger 429 after ~20 requests)
+for i in $(seq 1 50); do curl -s -o /dev/null -w "%{http_code}\n" http://localhost/; done
+
+# Faster attack
+for i in $(seq 1 100); do curl -s -o /dev/null http://localhost/ & done; wait
+
+# See the 429 responses
+curl -I http://localhost/
+```
+
+### Terminal 3: Run the dashboard
+```bash
+cd ~/DDOS_Protector/dashboard
+python3 app.py
+# Open http://localhost:8080
+```
+
+### Block an attacker
+```bash
+# Block IP
+sudo ipset add scr_blocklist 127.0.0.1
+
+# Now requests will be dropped completely
+curl http://localhost/  # Will timeout/fail
+
+# Unblock
+sudo ipset del scr_blocklist 127.0.0.1
+```
 
 ---
 
